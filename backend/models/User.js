@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
 
   // Verification Flags
   isEmailVerified: { type: Boolean, default: false },
+  emailOtp: { type: String },
+  emailOtpExpires: { type: Date },
   isIdentityVerified: { type: Boolean, default: false },
   verificationType: { type: String, enum: ['Student Email', 'Work Email', 'Government e-KYC', 'Aadhaar Verified', 'None'], default: 'None' },
   verificationBadges: { type: [String], default: [] },

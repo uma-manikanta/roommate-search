@@ -27,6 +27,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
+    if (res.data.requireVerification) {
+      return res.data; // Return early, don't log in yet
+    }
     setToken(res.data.token);
     setUser(res.data);
     localStorage.setItem('token', res.data.token);
@@ -36,6 +39,9 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     const res = await api.post('/auth/register', userData);
+    if (res.data.requireVerification) {
+      return res.data; // Return early, don't log in yet
+    }
     setToken(res.data.token);
     setUser(res.data);
     localStorage.setItem('token', res.data.token);

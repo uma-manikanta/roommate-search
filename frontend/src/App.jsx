@@ -7,6 +7,7 @@ import Matches from './pages/Matches';
 import Listings from './pages/Listings';
 import Profile from './pages/Profile';
 import VerificationCallback from './pages/VerificationCallback';
+import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/listings" element={<Listings />} />
           <Route path="/profile" element={<Profile />} />

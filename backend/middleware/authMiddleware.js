@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
   if (
@@ -14,8 +15,18 @@ const protect = (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Attach user id to request
-      req.user = { id: decoded.id };
+      // Attach user to request
+      const user = await User.findById(decoded.id).select('-passwordHash');
+
+      if (!user) {
+        return res.status(401).json({ message: 'Not authorized, user not found' });
+      }
+
+      if (!user.isEmailVerified) {
+        return res.status(403).json({ message: 'Email not verified. Please verify your email to access this route.' });
+      }
+
+      req.user = user;
       
       next();
     } catch (error) {

@@ -8,6 +8,7 @@ const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   // Local state for edits
   const [lifestyle, setLifestyle] = useState({
@@ -41,7 +42,7 @@ const Profile = () => {
       const updatedUser = { ...user, lifestyle: data.lifestyle, preferences: data.preferences };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
-      alert('Profile updated successfully! New matches will be generated.');
+      setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
       alert('Failed to update profile.');
@@ -53,7 +54,34 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-12">
+    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-12 relative">
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full text-center space-y-4 animate-fade-in">
+            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
+              <CheckCircle size={24} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900">Changes Saved!</h3>
+            <p className="text-gray-500 text-sm">Your preferences and lifestyle details have been updated.</p>
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => setShowSuccessModal(false)} 
+                className="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+              >
+                OK
+              </button>
+              <button 
+                onClick={() => navigate('/matches')} 
+                className="flex-1 py-2 px-4 rounded-lg bg-primary-600 text-white hover:bg-primary-700 font-medium transition-colors shadow-sm shadow-primary-500/30"
+              >
+                View Matches
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center gap-4 border-b border-gray-200 pb-6">
         {user.avatar ? (
           <img src={user.avatar} alt="Profile" className="w-20 h-20 rounded-full object-cover shadow-sm border-2 border-white" />

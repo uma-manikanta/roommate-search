@@ -1,19 +1,20 @@
-import React, { useState, useContext } from 'react';
-import { Mail, Lock, User as UserIcon, Calendar, Briefcase, MapPin, IndianRupee } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { Mail, Lock, User as UserIcon, Calendar, Briefcase, MapPin, IndianRupee, ArrowLeft } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 
 const Auth = () => {
   const { login, register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [isLogin, setIsLogin] = useState(true);
-  const [step, setStep] = useState(1);
+  const [isLogin, setIsLogin] = useState(location.state?.isLogin ?? true);
+  const [step, setStep] = useState(location.state?.step ?? 1);
   const [error, setError] = useState('');
 
   // Form State
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(location.state?.formData || {
     name: '', email: '', password: '', age: '', gender: 'Male', occupationStatus: 'Student',
     sleepSchedule: 3, cleanliness: 3, socialHabits: 3, dietaryPref: 'Flexible', smoking: false,
     targetCity: '', maxBudget: '', preferredGender: 'Any'
@@ -36,26 +37,30 @@ const Auth = () => {
     setStep(2);
   };
 
+  const handleBack = () => {
+    setError('');
+    setStep(1);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     try {
       if (isLogin) {
-        await login(formData.email, formData.password);
+        const authData = await login(formData.email, formData.password);
+        if (authData.requireVerification) {
+          navigate(`/verify-email?email=${encodeURIComponent(authData.email)}`, { state: { formData, isLogin, step } });
+          return;
+        }
         navigate('/matches');
       } else {
-        // Register API expects lifestyle and preferences objects. 
-        // We initially modeled the register route to take targetCity and maxBudget.
-        // Wait, the backend registerUser takes: name, email, password, gender, age, occupationStatus, targetCity, maxBudget.
-        // And then we need to call PUT /api/matches/lifestyle to save the rest!
         const authData = await register({
           name: formData.name, email: formData.email, password: formData.password,
           gender: formData.gender, age: Number(formData.age), occupationStatus: formData.occupationStatus,
           targetCity: formData.targetCity, maxBudget: Number(formData.maxBudget)
         });
         
-        // After register, update lifestyle
-        await api.put('/matches/lifestyle', {
+        const lifestyleData = {
           lifestyle: {
             sleepSchedule: Number(formData.sleepSchedule),
             cleanliness: Number(formData.cleanliness),
@@ -68,7 +73,16 @@ const Auth = () => {
             maxBudget: Number(formData.maxBudget),
             preferredGender: formData.preferredGender
           }
-        }, {
+        };
+
+        if (authData.requireVerification) {
+          localStorage.setItem('pendingLifestyle', JSON.stringify(lifestyleData));
+          navigate(`/verify-email?email=${encodeURIComponent(authData.email)}`, { state: { formData, isLogin, step } });
+          return;
+        }
+
+        // After register, update lifestyle
+        await api.put('/matches/lifestyle', lifestyleData, {
           headers: { Authorization: `Bearer ${authData.token}` }
         });
 
@@ -81,8 +95,17 @@ const Auth = () => {
 
   return (
     <div className="max-w-xl mx-auto mt-10 animate-fade-in pb-10">
-      <div className="glass-panel p-8 space-y-6">
-        <div className="text-center space-y-2">
+      <div className="glass-panel p-8 space-y-6 relative">
+        {!isLogin && step === 2 && (
+          <button 
+            onClick={handleBack} 
+            className="absolute left-6 top-6 text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1 text-sm font-medium"
+          >
+            <ArrowLeft size={18} /> Back
+          </button>
+        )}
+
+        <div className="text-center space-y-2 pt-2">
           <h2 className="text-3xl font-bold text-primary-900">
             {isLogin ? 'Welcome Back' : (step === 1 ? 'Create Account' : 'Lifestyle Preferences')}
           </h2>
@@ -221,7 +244,7 @@ const Auth = () => {
             </div>
           )}
 
-          <div className="pt-4">
+          <div className="pt-4 flex gap-3">
             {!isLogin && step === 1 ? (
               <button type="button" onClick={handleNext} className="btn-primary w-full py-2.5">
                 Next Step

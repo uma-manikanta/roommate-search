@@ -51,7 +51,7 @@ const Matches = () => {
           <h1 className="text-3xl font-bold text-primary-900">Your Top Matches</h1>
           <p className="text-gray-600 mt-2">Based on your lifestyle preferences and target city.</p>
         </div>
-        <button onClick={() => alert('Preferences editing coming soon!')} className="btn-outline hidden sm:block">Edit Preferences</button>
+        <button onClick={() => navigate('/profile')} className="btn-outline hidden sm:block">Edit Preferences</button>
       </div>
 
       {matches.length === 0 ? (
