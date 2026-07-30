@@ -1,0 +1,4 @@
+node_modules
+.env
+ANTIGRAVITY_PROMPT.md
+audit_report.md
