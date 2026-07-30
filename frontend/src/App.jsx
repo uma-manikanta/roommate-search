@@ -8,6 +8,7 @@ import Listings from './pages/Listings';
 import Profile from './pages/Profile';
 import VerificationCallback from './pages/VerificationCallback';
 import VerifyEmail from './pages/VerifyEmail';
+import Chats from './pages/Chats';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/listings" element={<Listings />} />
+          <Route path="/chats" element={<Chats />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/verification/callback" element={<VerificationCallback />} />
         </Routes>

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useContext } from 'react';
 import { ShieldCheck, MessageCircle, AlertCircle } from 'lucide-react';
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
-import ChatDrawer from '../components/ChatDrawer';
 import LifestyleRadar from '../components/LifestyleRadar';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,10 +11,6 @@ const Matches = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  // Chat Drawer State
-  const [chatOpen, setChatOpen] = useState(false);
-  const [activeMatchUser, setActiveMatchUser] = useState(null);
 
   useEffect(() => {
     if (!user) {
@@ -37,8 +32,7 @@ const Matches = () => {
   }, [user, navigate, femaleShield]);
 
   const openChat = (matchUser) => {
-    setActiveMatchUser(matchUser);
-    setChatOpen(true);
+    navigate(`/chats?user=${matchUser._id}&name=${encodeURIComponent(matchUser.name)}`);
   };
 
   if (loading) return <div className="text-center py-10">Loading matches...</div>;
@@ -102,12 +96,6 @@ const Matches = () => {
           ))}
         </div>
       )}
-
-      <ChatDrawer 
-        isOpen={chatOpen} 
-        onClose={() => setChatOpen(false)} 
-        matchUser={activeMatchUser} 
-      />
     </div>
   );
 };

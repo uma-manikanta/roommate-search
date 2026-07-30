@@ -50,6 +50,10 @@ io.on('connection', (socket) => {
 app.use(cors());
 app.use(express.json());
 
+// Serve uploads statically
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Inject io into request object
 app.use((req, res, next) => {
   req.io = io;
