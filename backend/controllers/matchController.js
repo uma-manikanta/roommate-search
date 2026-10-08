@@ -61,8 +61,13 @@ const getMatches = async (req, res) => {
 
       // --- Hard Blocks ---
       
-      // Female Safety Shield
-      if (req.query.femaleShield === 'true' && currentUser.gender === 'Female' && match.gender !== 'Female') {
+      // Female Safety Shield (Hide female match from male user if she enabled the shield)
+      if (currentUser.gender === 'Male' && match.gender === 'Female' && match.preferences.hideProfileFromMales) {
+        continue;
+      }
+
+      // If the current user is female and has the shield on, she probably also doesn't want to see males in her feed
+      if (currentUser.gender === 'Female' && currentUser.preferences.hideProfileFromMales && match.gender === 'Male') {
         continue;
       }
 

@@ -2,9 +2,11 @@ import React, { useState, useContext } from 'react';
 import { X, CheckCircle, Mail, Briefcase, FileSignature, ShieldCheck } from 'lucide-react';
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 
 const VerificationModal = ({ isOpen, onClose }) => {
   const { user, setUser } = useContext(AuthContext);
+  const { showAlert } = useDialog();
   const [activeTab, setActiveTab] = useState('student');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -19,7 +21,7 @@ const VerificationModal = ({ isOpen, onClose }) => {
       await api.post('/verify/email/send', { email });
       setStep(2);
     } catch (err) {
-      alert('Error sending OTP');
+      showAlert('Error sending OTP', 'Error');
     } finally {
       setLoading(false);
     }
@@ -29,14 +31,14 @@ const VerificationModal = ({ isOpen, onClose }) => {
     try {
       setLoading(true);
       const res = await api.post('/verify/email/confirm', { email, otp });
-      alert(res.data.message);
+      showAlert(res.data.message, 'Success');
       
       const updatedUser = { ...user, isEmailVerified: true, verificationType: res.data.verificationType };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       onClose();
     } catch (err) {
-      alert('Invalid OTP');
+      showAlert('Invalid OTP', 'Error');
     } finally {
       setLoading(false);
     }
@@ -52,7 +54,7 @@ const VerificationModal = ({ isOpen, onClose }) => {
       }
     } catch (err) {
       console.error(err);
-      alert('Failed to initiate DigiLocker. Please try again.');
+      showAlert('Failed to initiate DigiLocker. Please try again.', 'Error');
       setLoading(false);
     }
   };

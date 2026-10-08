@@ -150,7 +150,7 @@ const Auth = () => {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                     <Lock size={18} />
                   </div>
-                  <input type="password" name="password" value={formData.password} onChange={handleChange} required
+                  <input type="password" name="password" value={formData.password} onChange={handleChange} required autoComplete={isLogin ? "current-password" : "new-password"}
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-success-500 focus:border-success-500" placeholder="••••••••" />
                 </div>
               </div>

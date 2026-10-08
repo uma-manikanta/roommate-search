@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { X, ShieldCheck, CheckCircle } from 'lucide-react';
+import { X, Shield, Lock, FileText, CheckCircle } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import api from '../api/axios';
 
-const DigiLockerModal = ({ isOpen, onClose }) => {
-  const { user, setUser } = useContext(AuthContext);
+const DigiLockerModal = ({ isOpen, onClose, sessionId, onSuccess }) => {
+  const { setUser } = useContext(AuthContext);
+  const { showAlert } = useDialog();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [identifier, setIdentifier] = useState('');
@@ -38,11 +40,12 @@ const DigiLockerModal = ({ isOpen, onClose }) => {
       // Close modal automatically after 2 seconds
       setTimeout(() => {
         onClose();
+        if (onSuccess) onSuccess(res.data.user);
       }, 2000);
       
     } catch (err) {
       console.error(err);
-      alert('Failed to verify via DigiLocker');
+      showAlert('Failed to verify via DigiLocker', 'Error');
     } finally {
       setLoading(false);
     }

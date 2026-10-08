@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import api from '../api/axios';
 import { io } from 'socket.io-client';
 import { Send, Paperclip, MoreVertical, ShieldCheck, Reply, X, FileText, Image as ImageIcon, MessageCircle, ArrowLeft, Search } from 'lucide-react';
@@ -28,6 +29,7 @@ const formatChatDateHeader = (dateString) => {
 
 const Chats = () => {
   const { user } = useContext(AuthContext);
+  const { showAlert, showPrompt } = useDialog();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -214,12 +216,13 @@ const Chats = () => {
       fetchRecentChats(); // Update sidebar latest message
     } catch (err) {
       console.error('Error sending message:', err);
-      alert('Failed to send message.');
+      const errorMessage = err.response?.data?.message || 'Failed to send message.';
+      showAlert(errorMessage, 'Error Sending Message');
     }
   };
 
   const handleReportUser = async () => {
-    const reason = prompt("Please provide a reason for reporting this user:");
+    const reason = await showPrompt("Please provide a reason for reporting this user:", "Report User");
     if (!reason) return;
 
     try {
@@ -227,10 +230,10 @@ const Chats = () => {
         reportedUserId: activeChatUser._id,
         reason
       });
-      alert('User has been reported. Our team will review the chat logs.');
+      showAlert('User has been reported. Our team will review the chat logs.', 'Report Submitted');
       setMenuOpen(false);
     } catch (err) {
-      alert('Failed to report user.');
+      showAlert('Failed to report user.', 'Error');
     }
   };
 
@@ -252,7 +255,7 @@ const Chats = () => {
   
   const handleEditInit = (msg) => {
     setEditingMessage(msg);
-    setNewMessage(msg.message);
+    setNewMessage(msg.message || '');
     setReplyToMessage(null);
     setMsgMenuOpen(null);
     if (textareaRef.current) {

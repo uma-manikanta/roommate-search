@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(false); // Can be used for initial auth check
-  const [femaleShield, setFemaleShield] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, token, login, register, logout, loading, femaleShield, setFemaleShield }}>
+    <AuthContext.Provider value={{ user, setUser, token, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Calculator, FileText, X } from 'lucide-react';
 import api from '../api/axios';
+import { useDialog } from '../context/DialogContext';
 
 const ExpenseCalculator = ({ listing, onClose }) => {
+  const { showAlert } = useDialog();
   const [wifi, setWifi] = useState(1000);
   const [maid, setMaid] = useState(2500);
   const [electricity, setElectricity] = useState(1500);
@@ -37,7 +39,11 @@ const ExpenseCalculator = ({ listing, onClose }) => {
       link.parentNode.removeChild(link);
     } catch (err) {
       console.error('Failed to download agreement', err);
-      alert('Failed to generate agreement.');
+      if (err.response?.status === 403) {
+        showAlert(err.response.data.message || 'Verification required', 'Action Blocked');
+      } else {
+        showAlert('Failed to generate agreement.', 'Error');
+      }
     } finally {
       setDownloading(false);
     }

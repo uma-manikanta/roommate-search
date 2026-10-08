@@ -6,7 +6,7 @@ import LifestyleRadar from '../components/LifestyleRadar';
 import { useNavigate } from 'react-router-dom';
 
 const Matches = () => {
-  const { user, femaleShield } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const Matches = () => {
 
     const fetchMatches = async () => {
       try {
-        const { data } = await api.get(`/matches?femaleShield=${femaleShield || false}`);
+        const { data } = await api.get('/matches');
         setMatches(data);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch matches');
@@ -29,7 +29,7 @@ const Matches = () => {
       }
     };
     fetchMatches();
-  }, [user, navigate, femaleShield]);
+  }, [user, navigate]);
 
   const openChat = (matchUser) => {
     navigate(`/chats?user=${matchUser._id}&name=${encodeURIComponent(matchUser.name)}`);

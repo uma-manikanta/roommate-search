@@ -3,9 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Mail, ShieldCheck, RefreshCw, ArrowLeft } from 'lucide-react';
 import api from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 
 const VerifyEmail = () => {
   const [otp, setOtp] = useState('');
+  const { showAlert } = useDialog();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [countdown, setCountdown] = useState(60);
@@ -80,7 +82,7 @@ const VerifyEmail = () => {
       await api.post('/auth/resend-email-otp', { email });
       setCountdown(60);
       setError('');
-      alert('A new verification code has been sent to your email.');
+      showAlert('A new verification code has been sent to your email.', 'Code Resent');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to resend code.');
     }

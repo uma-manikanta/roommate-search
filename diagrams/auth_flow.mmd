@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client as React Client
+    participant API as Node/Express API
+    participant DB as MongoDB
+    Client->>API: POST /api/auth/login {email, password}
+    API->>DB: Query User by email
+    DB-->>API: Return User Document (incl. passwordHash)
+    API->>API: bcrypt.compare(password, passwordHash)
+    API->>API: Sign JWT token
+    API-->>Client: 200 OK { token }
+    Note over Client,API: Subsequent Requests
+    Client->>API: GET /api/match/find (Header: Authorization: Bearer token)
+    API->>API: Validate Token
+    API->>DB: Fetch Match Data
+    DB-->>API: Match Documents
+    API-->>Client: 200 OK (Matches JSON)

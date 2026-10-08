@@ -1,0 +1,22 @@
+erDiagram
+    USER ||--o{ MATCH : finds
+    USER ||--|| PREFERENCES : has
+    USER {
+        ObjectId _id
+        string email
+        string passwordHash
+        string fullName
+    }
+    PREFERENCES {
+        ObjectId _id
+        ObjectId userId
+        int budget
+        boolean isSmoker
+        int sleepSchedule
+    }
+    MATCH {
+        ObjectId _id
+        ObjectId userA_id
+        ObjectId userB_id
+        int compatibilityScore
+    }

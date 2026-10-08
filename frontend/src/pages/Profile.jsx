@@ -1,11 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { UserCircle, Settings, Target, MapPin, IndianRupee, ShieldCheck, CheckCircle } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { useDialog } from '../context/DialogContext';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
+  const { showAlert } = useDialog();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -22,7 +24,8 @@ const Profile = () => {
   const [preferences, setPreferences] = useState({
     targetCity: 'Bangalore',
     maxBudget: 15000,
-    preferredGender: 'Any'
+    preferredGender: 'Any',
+    hideProfileFromMales: false
   });
 
   useEffect(() => {
@@ -45,7 +48,7 @@ const Profile = () => {
       setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
-      alert('Failed to update profile.');
+      showAlert('Failed to update profile.', 'Error');
     } finally {
       setLoading(false);
     }
@@ -189,6 +192,39 @@ const Profile = () => {
                 <option value="Any">Any</option>
               </select>
             </div>
+
+            {/* Female Safety Shield Toggle (Only visible for females) */}
+            {user.gender === 'Female' && (
+              <div className="col-span-1 md:col-span-3 bg-pink-50/50 p-4 rounded-xl border border-pink-100 flex items-center justify-between shadow-sm mt-2">
+                <div>
+                  <h3 className="text-sm font-bold text-pink-900 flex items-center gap-1">
+                    <ShieldCheck size={16} className="text-pink-600" /> Female Safety Shield
+                  </h3>
+                  <p className="text-xs text-pink-700 mt-1">Hide your profile completely from male users across the platform.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer"
+                    checked={preferences.hideProfileFromMales || false}
+                    onChange={async (e) => {
+                      const isChecked = e.target.checked;
+                      setPreferences({...preferences, hideProfileFromMales: isChecked});
+                      try {
+                        const updatedPreferences = { ...(user.preferences || {}), hideProfileFromMales: isChecked };
+                        const { data } = await api.put('/matches/lifestyle', { preferences: updatedPreferences });
+                        const updatedUser = { ...user, preferences: data.preferences };
+                        setUser(updatedUser);
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                      } catch (err) {
+                        console.error('Failed to toggle Female Shield', err);
+                      }
+                    }}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-500"></div>
+                </label>
+              </div>
+            )}
           </div>
         </div>
 

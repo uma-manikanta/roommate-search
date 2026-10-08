@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { MapPin, IndianRupee, Plus, X } from 'lucide-react';
 import api from '../api/axios';
+import { useDialog } from '../context/DialogContext';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ExpenseCalculator from '../components/ExpenseCalculator';
 
 const Listings = () => {
   const { user, femaleShield } = useContext(AuthContext);
+  const { showAlert } = useDialog();
   const navigate = useNavigate();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,8 +60,7 @@ const Listings = () => {
       setFormData({ title: '', description: '', city: '', locality: '', rentPerHead: '', depositPerHead: '', roomType: 'Shared Room' });
       fetchListings(); // Refresh listings
     } catch (err) {
-      console.error(err);
-      alert('Failed to post listing');
+      showAlert('Failed to post listing', 'Error');
     }
   };
 

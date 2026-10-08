@@ -1,0 +1,10 @@
+flowchart TD
+    Start[User Requests Matches] --> Q1[Query DB for Users in location/budget]
+    Q1 --> F1{Apply Hard Constraints}
+    F1 -- "Violates Deal-Breaker" --> D1[Discard Profile]
+    F1 -- "Passes" --> S1[Score Sleep Schedule]
+    S1 --> S2[Score Cleanliness]
+    S2 --> S3[Score Social/Pet Preferences]
+    S3 --> Calc[Calculate Total Weighted Score]
+    Calc --> Sort[Sort by Compatibility %]
+    Sort --> Return[Return Sorted Array to Client]

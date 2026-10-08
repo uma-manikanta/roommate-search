@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { X, FileText } from 'lucide-react';
 import api from '../api/axios';
+import { useDialog } from '../context/DialogContext';
 
 const AgreementModal = ({ isOpen, onClose, matchUser }) => {
+  const { showAlert } = useDialog();
   const [formData, setFormData] = useState({
     propertyAddress: '',
     rentSplit: '50-50',
@@ -39,7 +41,7 @@ const AgreementModal = ({ isOpen, onClose, matchUser }) => {
       onClose();
     } catch (err) {
       console.error('Failed to download agreement', err);
-      alert('Failed to generate agreement.');
+      showAlert('Failed to generate agreement.', 'Error');
     } finally {
       setDownloading(false);
     }

@@ -38,7 +38,8 @@ const userSchema = new mongoose.Schema({
     targetCity: { type: String, required: true },
     maxBudget: { type: Number, required: true },
     preferredGender: { type: String, enum: ['Any', 'Same Gender Only'] },
-    moveInDate: { type: Date }
+    moveInDate: { type: Date },
+    hideProfileFromMales: { type: Boolean, default: false }
   },
 
   createdAt: { type: Date, default: Date.now }

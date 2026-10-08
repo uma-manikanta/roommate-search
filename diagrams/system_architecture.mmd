@@ -1,0 +1,8 @@
+graph TD
+    Client[React.js Frontend SPA]
+    Server[Node.js / Express Backend API]
+    DB[(MongoDB NoSQL Database)]
+    Client -- HTTP Requests / REST API --> Server
+    Server -- JSON Responses --> Client
+    Server -- Mongoose Queries --> DB
+    DB -- Documents --> Server

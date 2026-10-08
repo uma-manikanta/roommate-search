@@ -9,7 +9,7 @@ import { io } from 'socket.io-client';
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, setFemaleShield, femaleShield } = useContext(AuthContext);
+  const { user, setUser, logout } = useContext(AuthContext);
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -57,6 +57,19 @@ const Navbar = () => {
     };
   }, [user, location.pathname]); // re-fetch when location changes (e.g., leaving Chats page)
   
+  const handleShieldToggle = async (e) => {
+    const isChecked = e.target.checked;
+    try {
+      const updatedPreferences = { ...(user.preferences || {}), hideProfileFromMales: isChecked };
+      const { data } = await api.put('/matches/lifestyle', { preferences: updatedPreferences });
+      const updatedUser = { ...user, preferences: data.preferences };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Failed to toggle Female Shield', err);
+    }
+  };
+
   const navLinks = [
     { name: 'Home', path: '/', icon: <Home size={18} /> },
     { name: 'Matches', path: '/matches', icon: <Users size={18} /> },
@@ -105,13 +118,13 @@ const Navbar = () => {
               <div className="flex items-center gap-4">
                 {user.gender === 'Female' && (
                   <div className="hidden lg:flex items-center gap-2 bg-pink-50 px-3 py-1.5 rounded-full border border-pink-100">
-                    <Shield size={16} className={femaleShield ? 'text-pink-600' : 'text-gray-400'} />
+                    <Shield size={16} className={user?.preferences?.hideProfileFromMales ? 'text-pink-600' : 'text-gray-400'} />
                     <label className="text-xs font-medium text-pink-900 cursor-pointer flex items-center gap-2">
                       Female Shield
                       <input 
                         type="checkbox" 
-                        checked={femaleShield} 
-                        onChange={(e) => setFemaleShield(e.target.checked)}
+                        checked={user?.preferences?.hideProfileFromMales || false} 
+                        onChange={handleShieldToggle}
                         className="toggle-checkbox"
                       />
                     </label>
